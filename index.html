@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Sales CRM — the CRM that remembers every customer</title>
+    <meta
+      name="description"
+      content="Sales CRM is a sales CRM dashboard: a live overview, a drag-and-drop deal pipeline, customer profiles with every interaction, a team schedule, invoices, growth reports and onboarding projects — light and dark, fully animated."
+    />
+    <meta name="theme-color" content="#ebe8e1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400..700&display=swap" rel="stylesheet" />
+    <script>
+      // Before first paint: apply the saved theme so the shell never flashes the
+      // wrong palette. Falls back to light when storage is unavailable.
+      (function (d) {
+        d.classList.add('js');
+        try {
+          var t = JSON.parse(localStorage.getItem('rapport:theme') || '"light"');
+          d.dataset.theme =
+            t === 'system'
+              ? matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light'
+              : t;
+        } catch (e) {}
+      })(document.documentElement);
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
