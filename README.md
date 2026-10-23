@@ -1,47 +1,60 @@
-# Sales CRM — Recreated from crm-salesid.vercel.app
+# Sales CRM — Modern TanStack Webapp
 
-A faithful recreation of the **Sales CRM** web application from [crm-salesid.vercel.app](https://crm-salesid.vercel.app).
-
-## 🚀 Key Features & Modules
-
-- **Authentication / Demo Session**: Pre-configured demo login (`sofia@salescrm.app` / `rapport-demo`) with automatic fallback when Supabase is not configured, plus full session persistence via `localStorage`.
-- **Sales Overview**: Live revenue metrics, quarterly quota progress ring, win rate, 6M/12M range toggles, team member breakdown, and recent tasks.
-- **Deal Pipeline**: Drag-and-drop Kanban pipeline tracking deals across *Lead*, *Contacted*, *Demo*, *Proposal*, *Negotiation*, *Won*, and *Lost*.
-- **Customer Directory & Profiles**: Complete customer directory with detailed interaction timelines, meeting notes, deals, and contact details.
-- **Team Schedule**: Calendar scheduler, activity checklist, and follow-up tracking.
-- **Finance & Invoicing**: Revenue reporting, invoice status tags, and CSV export capabilities.
-- **Growth Reports**: Sales performance charts, conversion rates, and quota attainment reports.
-- **Onboarding Projects**: Multi-stage client onboarding trackers with task checklists and completion percentages.
-- **Global Finder & Command Palette**: Press `Ctrl+K` or `Cmd+K` anywhere to search contacts, deals, navigation routes, and actions.
-- **Interactive Call Logger**: Live phone call timer with log note generation and toast alerts.
-- **Dark & Light Themes**: Zero-flash theme system with persistent theme preference in `localStorage`.
+A modern recreation of the [crm-salesid.vercel.app](https://crm-salesid.vercel.app) Sales CRM, refactored into a **Modern TanStack Web Application**.
 
 ---
 
-## 🛠 Tech Stack
+## ⚡ Modern TanStack Architecture
 
-- **Framework**: React 18
-- **Build Tool**: Vite 6
-- **Styling**: Pure CSS design tokens (`Urbanist` typography, glassmorphism, fluid responsive layouts, micro-animations)
-- **Routing**: Client-side hash/history routing with protected route guards
-- **Data Architecture**: Self-contained in-memory & `localStorage` synchronized CRM repository
+This frontend is powered by the **TanStack Ecosystem**:
+
+1. **TanStack Query v5 (`@tanstack/react-query`)**:
+   - **Central Query Client**: Configured in [`src/lib/queryClient.js`](src/lib/queryClient.js) with 5-minute stale-time and 30-minute garbage collection.
+   - **Query Cache Invalidation & Reactivity**: The workspace state is managed as a reactive TanStack Query entity under `['workspace']`.
+   - **Dedicated Hooks**: Exposed in [`src/lib/tanstack-hooks.jsx`](src/lib/tanstack-hooks.jsx):
+     - `useWorkspaceQuery()` — Root workspace state.
+     - `useCustomersQuery()` & `useCustomerQuery(id)` — Customer records and individual profile detail.
+     - `useDealsQuery()` — Active deals.
+     - Mutation hooks (`useMoveDealMutation`, `useCreateCustomerMutation`, `useToggleTaskMutation`, etc.) with automatic cache invalidation.
+   - **React Query Devtools**: Bundled via `@tanstack/react-query-devtools` for inspecting queries, mutations, cache lifecycles, and network states.
+
+2. **TanStack Table v8 (`@tanstack/react-table`)**:
+   - Headless table engine implemented in [`src/components/TanStackTable.jsx`](src/components/TanStackTable.jsx):
+     - Interactive multi-column sorting (▲ / ▼ indicators).
+     - Live global text search and filtering.
+     - Pagination controls with page indicator.
+   - Dedicated CRM tables:
+     - [`src/components/TanStackCustomersTable.jsx`](src/components/TanStackCustomersTable.jsx) for the customer directory.
+     - [`src/components/TanStackInvoicesTable.jsx`](src/components/TanStackInvoicesTable.jsx) for revenue and invoicing.
+
+3. **TanStack Router (`@tanstack/react-router`)**:
+   - Type-safe, modular routing defined in [`src/router.jsx`](src/router.jsx) with routes:
+     - `/signin` — Auth guard and demo login.
+     - `/overview` — Sales overview dashboard, metrics, and charts.
+     - `/pipeline` — Kanban deal board with drag-and-drop.
+     - `/customers` & `/customers/$id` — Customer directory and interaction timeline.
+     - `/schedule` — Team agenda and task checklist.
+     - `/finance` — Invoicing and revenue tracking.
+     - `/growth` — Growth performance reports.
+     - `/projects` — Client onboarding project steps.
+     - `/settings` — Workspace preferences and audit logs.
 
 ---
 
-## 💻 Getting Started
+## 🚀 Getting Started
 
 ### 1. Install Dependencies
 ```bash
 npm install
 ```
 
-### 2. Start Development Server
+### 2. Start Dev Server
 ```bash
 npm run dev
 ```
-The app will be available at `http://localhost:3000`.
+Accessible at [http://localhost:3000](http://localhost:3000).
 
-### 3. Build for Production
+### 3. Build Production Bundle
 ```bash
 npm run build
 ```
@@ -50,13 +63,15 @@ npm run build
 ```bash
 npm run preview
 ```
-The preview will run at `http://localhost:4173`.
+Accessible at [http://localhost:4173](http://localhost:4173).
 
----
-
-## 🧪 Automated Route Verification
-
-You can run the end-to-end automated verification script (Puppeteer) with:
+### 5. Automated Verification
 ```bash
 node test_routes.js
 ```
+
+---
+
+## 🔑 Demo Login (Pre-filled)
+- **Email**: `sofia@salescrm.app`
+- **Password**: `rapport-demo`

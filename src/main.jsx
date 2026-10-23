@@ -1,4 +1,12 @@
 import './index.css';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { QueryClientProvider, useQuery, useQueryClient } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { queryClient } from './lib/queryClient.js';
+import { TanStackCustomersTable } from './components/TanStackCustomersTable.jsx';
+import { TanStackInvoicesTable } from './components/TanStackInvoicesTable.jsx';
+
 var ov = Object.defineProperty;
 var lv = (n, e, r) => e in n ? ov(n, e, {
   enumerable: true,
@@ -640,7 +648,7 @@ function fv() {
   return Bc.exports;
 }
 var a = fv();
-var k = Tu();
+var k = React;
 const mv = uv(k);
 const pv = cv({
   __proto__: null,
@@ -11749,7 +11757,7 @@ function wv() {
   _o.hydrateRoot = n.hydrateRoot;
   return _o;
 }
-var xv = wv();
+var xv = ReactDOM;
 ep(); /**
       * @remix-run/router v1.23.4
       *
@@ -16959,66 +16967,37 @@ function jn() {
   }
   return n;
 }
-function Oy({
-  children: n
-}) {
+function Oy({ children: n }) {
   const e = k.useRef(null);
   e.current ||= new mp();
   const r = e.current;
-  const [i, l] = k.useState("loading");
-  const [c, d] = k.useState(null);
-  const [h, m] = k.useState(null);
-  const [g, w] = k.useState(0);
-  const y = k.useRef(false);
-  const _ = k.useCallback(() => {
-    y.current = true;
-    try {
-      m(r.snapshot());
-      l("ready");
-      d(null);
-    } catch (b) {
-      d(b instanceof Error ? b.message : "Could not load the workspace");
-      l("error");
-    }
-  }, [r]);
-  k.useEffect(() => {
-    if (y.current) {
-      return;
-    }
-    const b = window.setTimeout(_, 120);
-    return () => window.clearTimeout(b);
-  }, [_, g]);
-  const v = k.useCallback(() => w(b => b + 1), []);
+  const qc = useQueryClient();
+
+  // Modern TanStack Query v5 cache & synchronization
+  const { data: snapshot, isLoading, error, refetch } = useQuery({
+    queryKey: ['workspace'],
+    queryFn: () => r.snapshot(),
+    initialData: () => r.snapshot()
+  });
+
   k.useEffect(() => {
     r.onChange = () => {
-      if (y.current) {
-        _();
-      } else {
-        v();
-      }
+      qc.invalidateQueries({ queryKey: ['workspace'] });
     };
     return () => {
       r.onChange = null;
     };
-  }, [r, _, v]);
-  const j = k.useMemo(() => h ? {
-    status: i,
-    error: c,
-    data: h,
+  }, [r, qc]);
+
+  const j = k.useMemo(() => ({
+    status: isLoading ? "loading" : error ? "error" : "ready",
+    error: error ? error.message : null,
+    data: snapshot || $y,
     repo: r,
-    reload: v
-  } : null, [h, i, c, r, v]);
-  if (j) {
-    return <hu.Provider value={j}>{n}</hu.Provider>;
-  } else {
-    return <hu.Provider value={{
-      status: i,
-      error: c,
-      data: $y,
-      repo: r,
-      reload: v
-    }}>{n}</hu.Provider>;
-  }
+    reload: refetch
+  }), [snapshot, isLoading, error, r, refetch]);
+
+  return <hu.Provider value={j}>{n}</hu.Provider>;
 }
 const $y = {
   me: {
@@ -33928,4 +33907,11 @@ const hg = document.getElementById("root");
 if (!hg) {
   throw new Error("Root element missing from index.html");
 }
-xv.createRoot(hg).render(<k.StrictMode><_Component44 /></k.StrictMode>);
+xv.createRoot(hg).render(
+  <k.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <_Component44 />
+      <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-right" />
+    </QueryClientProvider>
+  </k.StrictMode>
+);
